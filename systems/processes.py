@@ -92,6 +92,13 @@ class Distillation(System):
 
     
     def distill(self, input=dict()):
+        if None in [input.get("ethanol"), input.get("water"), input.get("sugar"), input.get("fiber")]:
+            return {
+                "ethanol": None,
+                "water": None,
+                "sugar": None,
+                "fiber": None
+            }
         distill_inefficiency = (1 / self.efficiency) - 1
         in_nonEthanol = input["water"] + input["sugar"] + input["fiber"]
         return {
