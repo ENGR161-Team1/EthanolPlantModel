@@ -21,14 +21,9 @@ class System:
         # Placeholder for mass conversion logic
     
     def iterateInputs(self, inputValues=dict()):
-        for key in inputValues:
-            self.inputs[key].append(inputValues[key])
-
-        for i in range(len(self.inputs["ethanol"])):
-            input_dict = {key: self.inputs[key][i] for key in self.inputs}
-            output_dict = self.massFunction(input_dict)
-            for key in self.outputs:
-                self.outputs[key].append(output_dict[key]) 
+        # self.inputs[key].append(inputValues[key]) for key in inputValues
+        pass
+        # Placeholder for iterating over inputs
     
     def display(self):
         pass
