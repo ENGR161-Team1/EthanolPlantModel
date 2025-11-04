@@ -21,9 +21,16 @@ class System:
         # Placeholder for mass conversion logic
     
     def iterateInputs(self, inputValues=dict()):
-        # self.inputs[key].append(inputValues[key]) for key in inputValues
-        pass
-        # Placeholder for iterating over inputs
+        # Appends input values to the inputs dictionary
+        for key in inputValues:
+            self.inputs[key].append(inputValues[key])
+
+        # Process each set of inputs and appends to outputs
+        for i in range(len(self.inputs["ethanol"])):
+            input_dict = {key: self.inputs[key][i] for key in self.inputs}
+            output_dict = self.massFunction(input_dict)
+            for key in self.outputs:
+                self.outputs[key].append(output_dict[key]) 
     
     def display(self):
         pass
@@ -46,18 +53,6 @@ class Fermentation(System):
 
 class Filtration(System):
     def __init__(self, efficiency=float):
-        inputs = {
-            "ethanol": [],
-            "water": [],
-            "sugar": [],
-            "fiber": []
-        }
-        outputs = {
-            "ethanol": [],
-            "water": [],
-            "sugar": [],
-            "fiber": []
-        }
         super().__init__("Filtration", efficiency, self.filter())
         # Additional initialization for Filter can go here
 
