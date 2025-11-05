@@ -37,9 +37,13 @@ class System:
         return self.outputs 
     
     def display(self, input=str, output=str):
-        display_figure = plt.figure()
-        pass
-        # Placeholder for display logic
+        display_plot = plt.plot(self.inputs[input], self.outputs[output], linestyle='--', marker='o')
+        display_plot.title(f"{self.name} System: {input} vs {output}")
+        display_plot.xlabel(f"Input {input} (units)")
+        display_plot.ylabel(f"Output {output} (units)")
+        display_plot.grid(True)
+        plt.show()
+
 
 class Fermentation(System):
     def __init__(self, efficiency=float):
