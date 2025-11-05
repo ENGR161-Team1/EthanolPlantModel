@@ -39,9 +39,6 @@ class System:
         return self.outputs 
     
     def display(self, input=str, output=str):
-        print(f"Displaying {self.name} System: {input} vs {output}") # Debug statement
-        print(f"Inputs: {self.inputs[input]}") # Debug statement
-        print(f"Outputs: {self.outputs[output]}") # Debug statement
         plt.plot(self.inputs[input], self.outputs[output], linestyle='--', marker='o')
         plt.title(f"{self.name} System: {input} vs {output}")
         plt.xlabel(f"Input {input} (units)")
