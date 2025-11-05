@@ -4,7 +4,20 @@
 This project contains a model of an ethanol production plant, developed as part of ENGR-161 coursework.
 
 ## Description
-The model simulates various processes involved in ethanol production from raw materials to final product.
+The model simulates various processes involved in ethanol production from raw materials to final product. It implements four key stages of production:
+
+1. **Fermentation**: Converts sugar into ethanol using a biochemical process, with a theoretical maximum conversion rate of 51% and configurable efficiency.
+2. **Filtration**: Removes solid particles and fiber content from the fermented mixture to prepare for distillation.
+3. **Distillation**: Separates and concentrates ethanol from the mixture by exploiting differences in boiling points.
+4. **Dehydration**: Removes remaining water content to produce high-purity ethanol.
+
+The model tracks mass balances throughout the process, considering the following components:
+- Ethanol concentration
+- Water content
+- Residual sugar
+- Fiber content
+
+Each process stage can be configured with different efficiency parameters to simulate real-world conditions and equipment limitations.
 
 ## Dependencies
 - Python >= 3.10
