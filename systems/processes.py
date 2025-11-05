@@ -1,6 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
-matplotlib.use("GTK4agg")
+matplotlib.use("gtk4agg")
 
 class System:
     def __init__(self, name=str, efficiency=float, massFunction=None):
