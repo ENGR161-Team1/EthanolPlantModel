@@ -71,14 +71,100 @@ class System:
         }
         self.efficiency = kwargs.get("efficiency", 1.0)
         self.massFunction = kwargs.get("massFunction", None)
+        self.densityWater = 997  # kg/m^3
+        self.densityEthanol = 789  # kg/m^3
+        self.densitySugar = 1590  # kg/m^3
+        self.densityFiber = 1311  # kg/m^3
 
-    def flowToMass(self):
-        pass
-        # Placeholder for mass conversion logic
+    def flowToMass(self, **kwargs):
+        inputs = kwargs.get("inputs", dict())
+        mode = kwargs.get("mode", "amount")
+        total_flow = kwargs.get("total_flow", None)
+        if mode not in ["amount", "composition"]:
+            raise ValueError("mode must be either 'amount' or 'composition'")
+        if not inputs:
+            raise ValueError("No inputs provided for conversion")
+        if mode == "amount":
+            mass_inputs = dict()
+            for component in inputs:
+                if component == "ethanol":
+                    mass_inputs[component] = inputs[component] * self.densityEthanol
+                elif component == "water":
+                    mass_inputs[component] = inputs[component] * self.densityWater
+                elif component == "sugar":
+                    mass_inputs[component] = inputs[component] * self.densitySugar
+                elif component == "fiber":
+                    mass_inputs[component] = inputs[component] * self.densityFiber
+                elif component == "total":
+                    mass_inputs[component] = inputs[component] * (
+                        self.densityEthanol + self.densityWater + self.densitySugar + self.densityFiber
+                    )  # Simplified total density calculation
+                else:
+                    raise ValueError(f"Unknown component: {component}")
+            return mass_inputs
+        else:  # composition
+            if total_flow is None:
+                raise ValueError("total_flow must be provided when mode is 'composition'")
+            mass_inputs = dict()
+            for component in inputs:
+                if component == "ethanol":
+                    mass_inputs[component] = inputs[component] * total_flow * self.densityEthanol
+                elif component == "water":
+                    mass_inputs[component] = inputs[component] * total_flow * self.densityWater
+                elif component == "sugar":
+                    mass_inputs[component] = inputs[component] * total_flow * self.densitySugar
+                elif component == "fiber":
+                    mass_inputs[component] = inputs[component] * total_flow * self.densityFiber
+                else:
+                    raise ValueError(f"Unknown component: {component}")
+            mass_inputs["total"] = sum(mass_inputs[component] for component in mass_inputs)
+            return mass_inputs
+            
     
-    def massToFlow(self):
-        pass
-        # Placeholder for flow conversion logic
+    def massToFlow(self, **kwargs):
+        inputs = kwargs.get("inputs", dict())
+        mode = kwargs.get("mode", "amount")
+        total_mass = kwargs.get("total_mass", None)
+        if mode not in ["amount", "composition"]:
+            raise ValueError("mode must be either 'amount' or 'composition'")
+        if not inputs:
+            raise ValueError("No inputs provided for conversion")
+        if mode == "amount":
+            flow_inputs = dict()
+            for component in inputs:
+                if component == "ethanol":
+                    flow_inputs[component] = inputs[component] / self.densityEthanol
+                elif component == "water":
+                    flow_inputs[component] = inputs[component] / self.densityWater
+                elif component == "sugar":
+                    flow_inputs[component] = inputs[component] / self.densitySugar
+                elif component == "fiber":
+                    flow_inputs[component] = inputs[component] / self.densityFiber
+                elif component == "total":
+                    flow_inputs[component] = inputs[component] / (
+                        self.densityEthanol + self.densityWater + self.densitySugar + self.densityFiber
+                    )  # Simplified total density calculation
+                else:
+                    raise ValueError(f"Unknown component: {component}")
+            return flow_inputs
+        else:  # composition
+            if total_mass is None:
+                raise ValueError("total_mass must be provided when mode is 'composition'")
+            flow_inputs = dict()
+            for component in inputs:
+                if component == "ethanol":
+                    flow_inputs[component] = inputs[component] * total_mass / self.densityEthanol
+                elif component == "water":
+                    flow_inputs[component] = inputs[component] * total_mass / self.densityWater
+                elif component == "sugar":
+                    flow_inputs[component] = inputs[component] * total_mass / self.densitySugar
+                elif component == "fiber":
+                    flow_inputs[component] = inputs[component] * total_mass / self.densityFiber
+                else:
+                    raise ValueError(f"Unknown component: {component}")
+            flow_inputs["total"] = sum(flow_inputs[component] for component in flow_inputs)
+            return flow_inputs
+
     
     def processMass(self, **kwargs):
         # Process mass inputs and return outputs based on specified types
@@ -86,7 +172,7 @@ class System:
         inputs = kwargs.get("inputs", dict())
         input_type = kwargs.get("input_type", "full")
         output_type = kwargs.get("output_type", "full")
-        total_amount = kwargs.get("total_amount", None)
+        total_mass = kwargs.get("total_mass", None)
 
         # Asking whether to store inputs and outputs into the system logs
         store_inputs = kwargs.get("store_inputs", False)
@@ -110,18 +196,18 @@ class System:
         
         # Convert inputs to amounts if necessary
         if input_type == "composition":
-            if total_amount is None:
-                raise ValueError("total_amount must be provided when input_type is 'composition'")
-            if total_amount <= 0:
-                raise ValueError("total_amount must be greater than zero")
+            if total_mass is None:
+                raise ValueError("total_mass must be provided when input_type is 'composition'")
+            if total_mass <= 0:
+                raise ValueError("total_mass must be greater than zero")
             if any(key not in inputs for key in ["ethanol", "water", "sugar", "fiber"]):
                 raise ValueError("All components must be provided when input_type is 'composition'")
-            input_amounts = {key: inputs[key] * total_amount for key in inputs}
+            input_amounts = {key: inputs[key] * total_mass for key in inputs}
             if store_inputs:
                 for key in input_amounts:
                     self.input_log["mass"]["amount"][key].append(input_amounts[key])
                     self.input_log["mass"]["composition"][key].append(inputs[key])
-                self.input_log["mass"]["amount"]["total"].append(total_amount)
+                self.input_log["mass"]["amount"]["total"].append(total_mass)
         elif input_type == "amount":
             if any(key not in inputs for key in ["ethanol", "water", "sugar", "fiber"]):
                 for key in ["ethanol", "water", "sugar", "fiber"]:
@@ -173,7 +259,43 @@ class System:
                     "composition": output_composition
                 }
                 return outputs
-        
+    
+
+    def processFlow(self, **kwargs):
+        # Convert flow inputs to mass, process them, and convert outputs back to flow
+        inputs = kwargs.get("inputs", dict())
+        input_type = kwargs.get("input_type", "full")
+        output_type = kwargs.get("output_type", "full")
+        total_flow = kwargs.get("total_flow", None)
+        store_inputs = kwargs.get("store_inputs", False)
+
+        # Convert flow inputs to mass inputs
+        if input_type == "full":
+            mass_inputs = {
+                "amount": self.flowToMass(inputs=inputs["amount"], mode="amount"),
+                "composition": self.flowToMass(inputs=inputs["composition"], mode="composition", total_flow=total_flow)
+            }
+            if store_inputs:
+                for key in mass_inputs["amount"]:
+                    self.input_log["flow"]["amount"][key].append(inputs["amount"][key])
+                    self.input_log["flow"]["composition"][key].append(inputs["composition"][key])
+                self.input_log["flow"]["amount"]["total"].append(total_flow)
+        elif input_type == "amount":
+            mass_inputs = self.flowToMass(inputs=inputs, mode="amount")
+            if store_inputs:
+                for key in mass_inputs:
+                    self.input_log["flow"]["amount"][key].append(inputs[key])
+                self.input_log["flow"]["amount"]["total"].append(sum(inputs.values()))
+        elif input_type == "composition":
+            if total_flow is None:
+                raise ValueError("total_flow must be provided when input_type is 'composition'")
+            mass_inputs = self.flowToMass(inputs=inputs, mode="composition", total_flow=total_flow)
+            if store_inputs:
+                for key in inputs:
+                    self.input_log["flow"]["composition"][key].append(inputs[key])
+                self.input_log["flow"]["amount"]["total"].append(total_flow)
+        else:
+            raise ValueError("input_type must be either 'amount', 'composition', or 'full'")
 
     def iterateInputs(self, inputValues=dict(), **kwargs):
         # Appends input values to the inputs dictionary
@@ -215,7 +337,7 @@ class Fermentation(System):
 
 class Filtration(System):
     def __init__(self, efficiency=float):
-        super().__init__("Filtration", efficiency, self.filter)
+        super().__init__(name = "Filtration", efficiency = efficiency, massFunction = self.filter)
         # Additional initialization for Filter can go here
 
     
@@ -229,7 +351,7 @@ class Filtration(System):
 
 class Distillation(System):
     def __init__(self, efficiency=float):
-        super().__init__("Distillation", efficiency, self.distill)
+        super().__init__(name = "Distillation", efficiency = efficiency, massFunction = self.distill)
         # Additional initialization for Distiller can go here
 
     
@@ -252,7 +374,7 @@ class Distillation(System):
 
 class Dehydration(System):
     def __init__(self, efficiency=float):
-        super().__init__("Dehydration", efficiency, self.dehydrate)
+        super().__init__(name = "Dehydration", efficiency = efficiency, massFunction = self.dehydrate)
         # Additional initialization for Dehydrator can go here
 
     
