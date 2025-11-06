@@ -2,7 +2,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 # matplotlib.use("gtk4agg") --- IGNORE ---
 
-
 class System:
     """
     Base class for modeling chemical processing systems.
