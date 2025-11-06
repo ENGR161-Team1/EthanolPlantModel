@@ -121,6 +121,7 @@ class System:
                 for key in input_amounts:
                     self.input_log["mass"]["amount"][key].append(input_amounts[key])
                     self.input_log["mass"]["composition"][key].append(inputs[key])
+                self.input_log["mass"]["amount"]["total"].append(total_amount)
         elif input_type == "amount":
             if any(key not in inputs for key in ["ethanol", "water", "sugar", "fiber"]):
                 for key in ["ethanol", "water", "sugar", "fiber"]:
@@ -128,10 +129,13 @@ class System:
                         inputs[key] = 0.0
             input_amounts = inputs
             if store_inputs:
+                input_total = sum(input_amounts.values())
+                if input_total <= 0:
+                    raise ValueError("Total input amount must be greater than zero to store composition")
                 for key in input_amounts:
                     self.input_log["mass"]["amount"][key].append(input_amounts[key])
-                    total_input = sum(input_amounts.values())
-                    self.input_log["mass"]["composition"][key].append(input_amounts[key] / total_input if total_input > 0 else 0)
+                    self.input_log["mass"]["composition"][key].append(input_amounts[key] / input_total if input_total > 0 else 0)
+                self.input_log["mass"]["amount"]["total"].append(input_total)
         else:  # full
             input_amounts = inputs["amount"]
             if "amount" not in inputs or "composition" not in inputs:
@@ -140,16 +144,19 @@ class System:
                 for key in input_amounts:
                     self.input_log["mass"]["amount"][key].append(input_amounts[key])
                     self.input_log["mass"]["composition"][key].append(inputs["composition"][key])
+                self.input_log["mass"]["amount"]["total"].append(sum(input_amounts.values())) 
         
         # Process inputs through massFunction
         output_amounts = self.massFunction(input_amounts) if self.massFunction else input_amounts
 
         # Calculate total output and format output based on output_type
         output_total = sum(output_amounts.values())
-        output_amounts["total"] = output_total
         if output_type == "amount":
+            output_amounts["total"] = output_total
             return output_amounts
         else: 
+            if output_total <= 0:
+                raise ValueError("Total output amount must be greater than zero to calculate composition")
             output_composition = {key: output_amounts[key] / output_total for key in output_amounts}
             if output_type == "composition":
                 return output_composition
@@ -159,10 +166,13 @@ class System:
                     for key in output_amounts:
                         self.output_log["mass"]["amount"][key].append(output_amounts[key])
                         self.output_log["mass"]["composition"][key].append(output_composition[key])
-                return {
+                    self.output_log["mass"]["amount"]["total"].append(output_total)
+                output_amounts["total"] = output_total
+                outputs = {
                     "amount": output_amounts,
                     "composition": output_composition
                 }
+                return outputs
         
 
     def iterateInputs(self, inputValues=dict(), **kwargs):
