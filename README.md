@@ -1,29 +1,49 @@
 # Ethanol Plant Model
 
 ## Overview
-This project contains a model of an ethanol production plant, developed as part of ENGR-161 coursework.
+This project contains a model of an ethanol production plant, developed as part of ENGR-16100 coursework. The model simulates the complete production pipeline from raw materials to high-purity ethanol through mass balance calculations and process efficiency modeling.
 
 ## Description
-The model simulates various processes involved in ethanol production from raw materials to final product. It implements four key stages of production:
+The model simulates four key stages of ethanol production:
 
-1. **Fermentation**: Converts sugar into ethanol using a biochemical process, with a theoretical maximum conversion rate of 51% and configurable efficiency.
-2. **Filtration**: Removes solid particles and fiber content from the fermented mixture to prepare for distillation.
-3. **Distillation**: Separates and concentrates ethanol from the mixture by exploiting differences in boiling points.
-4. **Dehydration**: Removes remaining water content to produce high-purity ethanol.
+1. **Fermentation**: Converts sugar into ethanol using a biochemical process
+   - Theoretical maximum conversion: 51% of sugar mass to ethanol
+   - Configurable efficiency parameter (0.0 to 1.0)
+   - Preserves water and fiber content through the process
 
-The model tracks mass balances throughout the process, considering the following components:
-- Ethanol concentration
-- Water content
-- Residual sugar
-- Fiber content
+2. **Filtration**: Removes solid particles and fiber content
+   - Efficiency-based fiber removal
+   - Passes ethanol, water, and sugar through unchanged
 
-Each process stage can be configured with different efficiency parameters to simulate real-world conditions and equipment limitations.
+3. **Distillation**: Separates and concentrates ethanol
+   - Exploits differences in boiling points
+   - Some carry-over of non-ethanol components based on efficiency
+
+4. **Dehydration**: Removes remaining water content
+   - Produces high-purity ethanol
+   - Efficiency-based water removal
+
+### Mass Balance Tracking
+The model tracks four components throughout the process:
+- **Ethanol**: Product concentration
+- **Water**: Solvent and byproduct
+- **Sugar**: Raw material and residual
+- **Fiber**: Solid waste material
+
+Each `System` class maintains input and output histories for all components, enabling detailed analysis and visualization of the production process.
+
+## Features
+- Mass balance calculations for each process stage
+- Configurable efficiency parameters for realistic simulations
+- Built-in visualization using Matplotlib with GTK4 backend
+- Iterative processing of multiple input batches
+- Component tracking across the entire production pipeline
 
 ## Dependencies
 - Python >= 3.10
 - NumPy
 - Matplotlib
-- PyGObject
+- PyGObject (GTK4 bindings)
 
 ## Installation
 
@@ -31,12 +51,14 @@ Each process stage can be configured with different efficiency parameters to sim
 ```bash
 # Clone the repository
 git clone https://github.com/ENGR161-Team1/EthanolPlantModel.git
-
-# Install necessary packages
-sudo apt install libgirepository2.0-dev libcairo2-dev libgtk-4-dev pkg-config python3-dev python3-gi python3-gi-cairo gir1.2-gtk-4.0 gobject-introspection
-
-# Install using pip
 cd EthanolPlantModel
+
+# Install system dependencies (Ubuntu/Debian)
+sudo apt install libgirepository2.0-dev libcairo2-dev libgtk-4-dev \
+    pkg-config python3-dev python3-gi python3-gi-cairo \
+    gir1.2-gtk-4.0 gobject-introspection
+
+# Install Python package
 pip install .
 ```
 
@@ -47,59 +69,102 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone the repository
 git clone https://github.com/ENGR161-Team1/EthanolPlantModel.git
+cd EthanolPlantModel
 
-# Install necessary packages
-sudo apt install libgirepository2.0-dev libcairo2-dev libgtk-4-dev pkg-config python3-dev python3-gi python3-gi-cairo gir1.2-gtk-4.0 gobject-introspection
+# Install system dependencies (Ubuntu/Debian)
+sudo apt install libgirepository2.0-dev libcairo2-dev libgtk-4-dev \
+    pkg-config python3-dev python3-gi python3-gi-cairo \
+    gir1.2-gtk-4.0 gobject-introspection
 
 # Install using uv
-cd EthanolPlantModel
 uv pip install .
 ```
 
 ## Usage
+
+### Basic Example
 ```python
 from systems.processes import Fermentation, Filtration, Distillation, Dehydration
 
-# Initialize systems with efficiency values
-fermenter = Fermentation(0.85)  # 85% conversion efficiency
-filter = Filtration(0.90)       # 90% filtering efficiency
-distiller = Distillation(0.80)  # 80% distillation efficiency
-dehydrator = Dehydration(0.95)  # 95% dehydration efficiency
+# Initialize systems with efficiency values (0.0 to 1.0)
+fermenter = Fermentation(efficiency=0.85)    # 85% sugar conversion
+filter_system = Filtration(efficiency=0.90)  # 90% fiber removal
+distiller = Distillation(efficiency=0.80)    # 80% separation efficiency
+dehydrator = Dehydration(efficiency=0.95)    # 95% water removal
 
-# Configure input parameters
+# Configure input parameters (single batch)
 input_values = {
-    "ethanol": [0],     # Initial ethanol content in kg
-    "water": [3000],    # Water content in liters/kg
-    "sugar": [1000],    # Sugar content in kg
-    "fiber": [100]      # Fiber content in kg
+    "ethanol": [0],      # Initial ethanol: 0 kg
+    "water": [3000],     # Water: 3000 kg
+    "sugar": [1000],     # Sugar: 1000 kg
+    "fiber": [100]       # Fiber: 100 kg
 }
 
-# Process the materials through each system
+# Process through the production pipeline
 fermented = fermenter.iterateInputs(input_values)
-filtered = filter.iterateInputs(fermented)
+filtered = filter_system.iterateInputs(fermented)
 distilled = distiller.iterateInputs(filtered)
-dehydrated = dehydrator.iterateInputs(distilled)
+final_output = dehydrator.iterateInputs(distilled)
 
-# Access the output values
-final_ethanol = dehydrated["ethanol"][-1]
-final_water = dehydrated["water"][-1]
-print(f"Final ethanol: {final_ethanol:.2f} units")
-print(f"Remaining water: {final_water:.2f} units")
+# Display results
+print(f"Final ethanol: {final_output['ethanol'][-1]:.2f} kg")
+print(f"Final water: {final_output['water'][-1]:.2f} kg")
+print(f"Residual sugar: {final_output['sugar'][-1]:.2f} kg")
+print(f"Residual fiber: {final_output['fiber'][-1]:.2f} kg")
+```
+
+### Visualization Example
+```python
+# Visualize the relationship between input sugar and output ethanol
+fermenter.display(input="sugar", output="ethanol")
+
+# Visualize water content through distillation
+distiller.display(input="water", output="ethanol")
+```
+
+### Multiple Batch Processing
+```python
+# Process multiple batches with varying inputs
+multi_batch_inputs = {
+    "ethanol": [0, 0, 0],
+    "water": [2500, 3000, 3500],
+    "sugar": [800, 1000, 1200],
+    "fiber": [80, 100, 120]
+}
+
+# Process all batches through the system
+results = fermenter.iterateInputs(multi_batch_inputs)
+# Each component list will contain results for all three batches
 ```
 
 ## System Components
 
+### System (Base Class)
+The base class for all process systems, providing:
+- Input/output tracking for all components
+- Mass function execution via `massFunction`
+- Batch iteration capabilities with `iterateInputs()`
+- Visualization with `display()`
+
 ### Fermentation
-Converts sugar to ethanol with the given efficiency. The theoretical maximum conversion rate is 51% of sugar mass to ethanol.
+- **Input**: Sugar, water, fiber
+- **Output**: Ethanol (51% × sugar × efficiency), unconverted sugar, water, fiber
+- **Efficiency effect**: Determines sugar conversion rate
 
 ### Filtration
-Removes fiber content from the mixture based on the efficiency rate.
+- **Input**: All components from fermentation
+- **Output**: Ethanol, water, sugar pass through; fiber reduced by efficiency
+- **Efficiency effect**: Determines fiber removal rate
 
 ### Distillation
-Separates ethanol from the mixture, with some carry-over of other components based on efficiency.
+- **Input**: All components from filtration
+- **Output**: Concentrated ethanol with some carry-over impurities
+- **Efficiency effect**: Determines purity of separation
 
 ### Dehydration
-Removes water from the ethanol mixture to achieve higher purity, based on the given efficiency.
+- **Input**: All components from distillation
+- **Output**: High-purity ethanol with reduced water content
+- **Efficiency effect**: Determines water removal rate
 
 ## Project Structure
 ```
@@ -111,14 +176,18 @@ EthanolPlantModel/
 └── pyproject.toml
 ```
 
-## Testing
-```bash
-# Run unit tests
-python -m pytest tests/
+## API Reference
 
-# Run specific test file
-python -m pytest tests/test_fermentation.py
-```
+### System Methods
+- `iterateInputs(inputValues: dict) -> dict`: Process input batches and return outputs
+- `display(input: str, output: str)`: Visualize input vs output relationship
+- `convertMass()`: Placeholder for future mass conversion logic
+
+### Process-Specific Methods
+- `Fermentation.ferment(input: dict) -> dict`: Execute fermentation mass balance
+- `Filtration.filter(input: dict) -> dict`: Execute filtration mass balance
+- `Distillation.distill(input: dict) -> dict`: Execute distillation mass balance
+- `Dehydration.dehydrate(input: dict) -> dict`: Execute dehydration mass balance
 
 ## Contributing
 1. Fork the repository
@@ -127,11 +196,14 @@ python -m pytest tests/test_fermentation.py
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## Contact
-- Advay R. Chandra - chand289@purdue.edu
-- Karley J. Hammond - hammon88@purdue.edu
-- Samuel M. Razor - razor@purdue.edu
-- Katherine E. Hampton - hampto64@purdue.edu
+## Team Members
+- **Advay R. Chandra** - chand289@purdue.edu
+- **Karley J. Hammond** - hammon88@purdue.edu
+- **Samuel M. Razor** - razor@purdue.edu
+- **Katherine E. Hampton** - hampto64@purdue.edu
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+Developed as part of ENGR-16100 coursework at Purdue University.
