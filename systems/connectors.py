@@ -27,14 +27,14 @@ class Connector:
         
         Args:
             inputs: Dictionary containing:
-                - input_flow: Volumetric flow rate in m³/s
-                - input_mass: Mass flow rate in kg/s
+                - input_flow: Volumetric flow rate in m³/h
+                - input_mass: Mass flow rate in kg/h
         
         Returns:
             Density in kg/m³, or 0 if volumetric flow is zero
         """
-        input_flow = inputs.get("input_flow", 0) # input volumetric flow rate in m3/s
-        input_mass = inputs.get("input_mass", 0) # input mass flow rate in kg/s
+        input_flow = inputs.get("input_flow", 0) # input volumetric flow rate in m3/h
+        input_mass = inputs.get("input_mass", 0) # input mass flow rate in kg/h
         return input_mass / input_flow if input_flow != 0 else 0
 
 class Pipe(Connector):
@@ -62,8 +62,8 @@ class Pipe(Connector):
         Uses simplified Darcy-Weisbach equation for pressure drop.
         
         Args:
-            input_flow: Volumetric flow rate in m³/s
-            input_mass: Mass flow rate in kg/s
+            input_flow: Volumetric flow rate in m³/h
+            input_mass: Mass flow rate in kg/h
             input_energy: Input energy in Joules
         
         Returns:
@@ -83,10 +83,10 @@ class Pipe(Connector):
         Assumes no mass loss (conservation of mass).
         
         Args:
-            input_mass: Input mass flow rate in kg/s
+            input_mass: Input mass flow rate in kg/h
         
         Returns:
-            Output mass flow rate in kg/s (equal to input)
+            Output mass flow rate in kg/h (equal to input)
         """
         input_mass = kwargs.get("input_mass", 0)
         return input_mass  # No mass loss in the pipe
@@ -117,8 +117,8 @@ class Bend(Connector):
         Loss is based on kinetic energy and bend efficiency.
         
         Args:
-            input_flow: Volumetric flow rate in m³/s
-            input_mass: Mass flow rate in kg/s
+            input_flow: Volumetric flow rate in m³/h
+            input_mass: Mass flow rate in kg/h
             input_energy: Input energy in Joules
         
         Returns:
@@ -144,10 +144,10 @@ class Bend(Connector):
         Assumes no mass loss (conservation of mass).
         
         Args:
-            input_mass: Input mass flow rate in kg/s
+            input_mass: Input mass flow rate in kg/h
         
         Returns:
-            Output mass flow rate in kg/s (equal to input)
+            Output mass flow rate in kg/h (equal to input)
         """
         input_mass = kwargs.get("input_mass", 0)
         return input_mass  # No mass loss in the bend
@@ -175,8 +175,8 @@ class Valve(Connector):
         Loss is based on kinetic energy and resistance coefficient.
         
         Args:
-            input_flow: Volumetric flow rate in m³/s
-            input_mass: Mass flow rate in kg/s
+            input_flow: Volumetric flow rate in m³/h
+            input_mass: Mass flow rate in kg/h
             input_energy: Input energy in Joules
         
         Returns:
@@ -199,10 +199,10 @@ class Valve(Connector):
         Assumes no mass loss (conservation of mass).
         
         Args:
-            input_mass: Input mass flow rate in kg/s
+            input_mass: Input mass flow rate in kg/h
         
         Returns:
-            Output mass flow rate in kg/s (equal to input)
+            Output mass flow rate in kg/h (equal to input)
         """
         input_mass = kwargs.get("input_mass", 0)
         return input_mass  # No mass loss in the valve
