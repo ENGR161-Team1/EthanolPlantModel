@@ -1,5 +1,7 @@
 # Ethanol Plant Model
 
+**Version:** 0.3.0
+
 ## Overview
 This project contains a model of an ethanol production plant, developed as part of ENGR-16100 coursework. The model simulates the complete production pipeline from raw materials to high-purity ethanol through mass balance calculations, process efficiency modeling, and fluid transport dynamics.
 
@@ -346,7 +348,7 @@ The base class for all process systems, providing:
 
 #### Connector (Base Class)
 Base class for all fluid transport connectors, providing:
-- Density calculation from mass and flow rates
+- Density calculation from mass and volumetric flow rates
 - Configurable diameter and cross-sectional area
 - Mass and energy function interfaces
 
