@@ -15,74 +15,7 @@ class System:
         Sets up input/output logs for tracking mass and flow data.
         """
         self.name = kwargs.get("name", "System")
-        """
-        # Old log structure:
-        self.input_log = {
-            "mass": {
-                "amount": {
-                    "ethanol": [],
-                    "water": [],
-                    "sugar": [],
-                    "fiber": [],
-                    "total": []
-                },
-                "composition": {
-                    "ethanol": [],
-                    "water": [],
-                    "sugar": [],
-                    "fiber": []
-                }
-            },
-            "flow": {
-                "amount": {
-                    "ethanol": [],
-                    "water": [],
-                    "sugar": [],
-                    "fiber": [],
-                    "total": []
-                },
-                "composition": {
-                    "ethanol": [],
-                    "water": [],
-                    "sugar": [],
-                    "fiber": []
-                }
-            }
-        }
-        self.output_log = {
-            "mass": {
-                "amount": {
-                    "ethanol": [],
-                    "water": [],
-                    "sugar": [],
-                    "fiber": [],
-                    "total": []
-                },
-                "composition": {
-                    "ethanol": [],
-                    "water": [],
-                    "sugar": [],
-                    "fiber": []
-                },
-            },
-            "flow": {
-                "amount": {
-                    "ethanol": [],
-                    "water": [],
-                    "sugar": [],
-                    "fiber": [],
-                    "total": []
-                },
-                "composition": {
-                    "ethanol": [],
-                    "water": [],
-                    "sugar": [],
-                    "fiber": []
-                },
-            }
-        }
-        """
-
+        
         # New log structure without 'total' in composition and separated amount/composition
         self.input_log = {
             "mass": {
