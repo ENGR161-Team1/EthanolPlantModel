@@ -4,22 +4,19 @@
 
 Welcome to the Ethanol Plant Model documentation. This project provides a comprehensive simulation of an ethanol production plant developed for ENGR-16100 coursework.
 
-## 📖 Documentation
+---
 
-### Getting Started
-- [Installation and Setup](getting-started.md)
-- [Basic Usage Examples](getting-started.md#basic-usage)
-- [Your First Simulation](getting-started.md#your-first-simulation)
+## 📖 Quick Navigation
 
-### Reference Documentation
-- [Complete API Reference](api-reference.md)
-- [Process Systems Guide](process-systems.md)
-- [Connector Systems Guide](connector-systems.md)
+| Section | Description |
+|---------|-------------|
+| [Getting Started](getting-started.md) | Installation, setup, and basic usage |
+| [API Reference](api-reference.md) | Complete API documentation |
+| [Process Systems](process-systems.md) | Fermentation, filtration, distillation, dehydration |
+| [Connector Systems](connector-systems.md) | Pipes, bends, and valves |
+| [Examples](examples.md) | Practical examples and tutorials |
 
-### Tutorials and Examples
-- [Practical Examples](examples.md)
-- [Complete Pipeline Examples](examples.md#complete-pipeline)
-- [Batch Processing](examples.md#batch-processing)
+---
 
 ## What is the Ethanol Plant Model?
 
@@ -73,15 +70,59 @@ cd EthanolPlantModel
 pip install .
 ```
 
-## Documentation Structure
+## Documentation Sections
 
-| Section | Description |
-|---------|-------------|
-| [Getting Started](getting-started.md) | Installation, setup, and basic usage |
-| [API Reference](api-reference.md) | Complete API documentation with all methods |
-| [Process Systems](process-systems.md) | Detailed guide to fermentation, filtration, distillation, and dehydration |
-| [Connector Systems](connector-systems.md) | Fluid transport components: pipes, bends, and valves |
-| [Examples](examples.md) | Practical examples and complete tutorials |
+### [Getting Started](getting-started.md)
+Learn how to install and start using the Ethanol Plant Model. Includes:
+- System requirements and dependencies
+- Installation steps (pip and uv)
+- Your first simulation
+- Understanding input/output types
+- Complete pipeline example
+
+### [API Reference](api-reference.md)
+Complete API documentation for all classes and methods:
+- System base class with core processing methods
+- Process systems (Fermentation, Filtration, Distillation, Dehydration)
+- Connector systems (Pipe, Bend, Valve)
+- All methods with parameters, return types, and examples
+
+### [Process Systems](process-systems.md)
+Detailed documentation for each process stage:
+- Process descriptions and stoichiometry
+- Input/output specifications
+- Efficiency effects and typical values
+- Examples with expected results
+- Complete pipeline configuration
+
+### [Connector Systems](connector-systems.md)
+Fluid transport component documentation:
+- Energy loss calculations and formulas
+- Typical parameter values for different configurations
+- Integration with process systems
+- Complete transport pipeline examples
+
+### [Examples](examples.md)
+Practical tutorials and examples:
+- Basic single process operations
+- Complete production pipeline
+- Batch processing with multiple inputs
+- Flow-based processing
+- Transport with energy loss connectors
+- Logging and visualization techniques
+
+## Component Tracking
+
+The model tracks four components throughout the production process:
+
+| Component | Density (kg/m³) | Role |
+|-----------|-----------------|------|
+| **Ethanol** | 789 | Product concentration |
+| **Water** | 997 | Solvent and byproduct |
+| **Sugar** | 1590 | Raw material and residual |
+| **Fiber** | 1311 | Solid waste material |
+
+Each `System` maintains detailed input/output histories enabling comprehensive analysis and visualization.
 
 ## Support
 
@@ -94,12 +135,22 @@ For questions or issues, please contact the development team:
 
 ## Contributing
 
-Contributions are welcome! Please see the main [README](../README.md) for contribution guidelines.
+Contributions are welcome! Please see the main [README](../README.md) for contribution guidelines:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
 MIT License - See [LICENSE](../LICENSE) file for details.
 
+## Acknowledgments
+
+Developed as part of ENGR-16100 coursework at Purdue University.
+
 ---
 
-**Navigation:** [Home](README.md) | [Getting Started](getting-started.md) | [API Reference](api-reference.md) | [Examples](examples.md)
+**Navigation:** [Home](README.md) | [Getting Started](getting-started.md) | [API Reference](api-reference.md) | [Process Systems](process-systems.md) | [Connector Systems](connector-systems.md) | [Examples](examples.md)

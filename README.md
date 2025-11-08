@@ -108,7 +108,7 @@ EthanolPlantModel/
 │   ├── processes.py    # Core process systems
 │   └── connectors.py   # Fluid transport connectors
 ├── docs/               # Documentation
-│   ├── index.md
+│   ├── README.md
 │   ├── getting-started.md
 │   ├── api-reference.md
 │   ├── process-systems.md
