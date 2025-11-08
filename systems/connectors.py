@@ -33,6 +33,20 @@ class Connector:
         input_flow = kwargs.get("input_flow", 0)
         input_mass = kwargs.get("input_mass", 0)
         return input_mass / input_flow if input_flow != 0 else 0
+    
+    def processEnergy(self, **kwargs):
+        """
+        Calculate output kinetic energy after energy losses.
+        
+        Args:
+            input_energy: Input kinetic energy in Joules
+            
+        Returns:
+            output_energy: Output kinetic energy in Joules
+        """
+        input_energy = kwargs.get("input_energy", 0)
+        return input_energy - self.energyConsumed(**kwargs)
+
 
     def processFlow(self, **kwargs):
         """
@@ -46,15 +60,22 @@ class Connector:
         Returns:
             float: Output volumetric flow rate in m³/s
         """
+        # Extract input parameters from kwargs
         input_flow = kwargs.get("input_flow", 0)
         input_mass = kwargs.get("input_mass", 0)
         interval = kwargs.get("interval", 1)
         
+        # Calculate flow velocity from volumetric flow rate and cross-sectional area
         velocity = input_flow / self.cross_sectional_area if self.cross_sectional_area != 0 else 0
+        
+        # Calculate input kinetic energy over the time interval
         input_energy = interval * input_mass * (velocity ** 2) / 2
-        output_energy = input_energy - self.energyConsumed(**kwargs)
+        
+        # Calculate output energy after accounting for energy losses
+        output_energy = self.processEnergy(self, input_energy=input_energy)
 
-        output_flow = ((output_energy * self.cross_sectional_area) / (self.processDensity(**kwargs) * interval)) ** (float(1) / 3) if self.processDensity(**kwargs) != 0 else 0
+        # Calculate output flow rate from output energy using inverse kinetic energy formula
+        output_flow = math.root(2 * output_energy * self.cross_sectional_area**2 / (self.processDensity(**kwargs) * interval), 3) if self.processDensity(**kwargs) * interval != 0 else 0
         return output_flow
 
 
