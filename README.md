@@ -1,6 +1,6 @@
 # Ethanol Plant Model
 
-**Version:** 0.3.0
+**Version:** 0.4.0
 
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -26,26 +26,29 @@ from systems.processes import Fermentation
 # Create a fermentation system with 95% efficiency
 fermenter = Fermentation(efficiency=0.95)
 
-# Process inputs
+# Process inputs - note the updated API
 result = fermenter.processMass(
     inputs={"ethanol": 0, "water": 100, "sugar": 50, "fiber": 10},
     input_type="amount",
-    output_type="full"
+    output_type="full",
+    store_outputs=False
 )
 
 print(f"Ethanol produced: {result['amount']['ethanol']:.2f} kg")
-print(f"Purity: {result['composition']['ethanol']:.2%}")
+print(f"Water remaining: {result['amount']['water']:.2f} kg")
+print(f"Ethanol purity: {result['composition']['ethanol']:.2%}")
 ```
 
 ## Features
 
 - ✅ Mass and volumetric flow balance calculations
-- ✅ Energy loss modeling for fluid transport
-- ✅ Configurable efficiency parameters
-- ✅ Flexible input/output formats
-- ✅ Built-in visualization
-- ✅ Batch processing capabilities
-- ✅ Component tracking across the pipeline
+- ✅ Energy loss modeling for fluid transport (Darcy-Weisbach, bend losses)
+- ✅ Configurable efficiency parameters for all process units
+- ✅ Flexible input/output formats (amount, composition, or full)
+- ✅ Comprehensive logging system for process tracking
+- ✅ Built-in visualization capabilities
+- ✅ Batch processing with iterative methods
+- ✅ Component tracking across the entire pipeline
 
 ## System Components
 
@@ -53,16 +56,16 @@ print(f"Purity: {result['composition']['ethanol']:.2%}")
 
 1. **Fermentation** - Converts sugar into ethanol (51% theoretical yield)
 2. **Filtration** - Removes solid particles and fiber content
-3. **Distillation** - Separates and concentrates ethanol
-4. **Dehydration** - Removes remaining water content
+3. **Distillation** - Separates and concentrates ethanol from impurities
+4. **Dehydration** - Removes remaining water content for high-purity ethanol
 
 ### Fluid Transport Components
 
 - **Pipe** - Straight segments with friction losses (Darcy-Weisbach equation)
-- **Bend** - Elbows with direction change losses
-- **Valve** - Flow control with adjustable resistance
+- **Bend** - Elbows with direction change losses based on bend geometry
+- **Valve** - Flow control with adjustable resistance coefficients
 
-All connectors conserve mass while calculating realistic energy dissipation.
+All connectors conserve mass while calculating realistic energy dissipation based on fluid dynamics principles.
 
 ## Installation
 
@@ -96,17 +99,17 @@ uv pip install .
 ## Dependencies
 
 - Python >= 3.10
-- NumPy
-- Matplotlib
-- PyGObject (GTK4 bindings)
+- NumPy - Numerical computations
+- Matplotlib - Visualization
+- PyGObject - GTK4 bindings for GUI support
 
 ## Project Structure
 
 ```
 EthanolPlantModel/
 ├── systems/
-│   ├── processes.py    # Core process systems
-│   └── connectors.py   # Fluid transport connectors
+│   ├── processes.py    # Core process systems (Fermentation, Filtration, etc.)
+│   └── connectors.py   # Fluid transport connectors (Pipe, Bend, Valve)
 ├── docs/               # Documentation
 │   ├── README.md
 │   ├── getting-started.md
@@ -118,6 +121,14 @@ EthanolPlantModel/
 ├── README.md
 └── pyproject.toml
 ```
+
+## Recent Updates (v0.4.0)
+
+- Refactored connector API to use kwargs for improved flexibility
+- Enhanced flow calculation using cube root for accurate energy balance
+- Improved logging structure with separated amount/composition tracking
+- Added comprehensive error handling and input validation
+- Updated density-based mass/flow conversions for accuracy
 
 ## Contributing
 
