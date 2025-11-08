@@ -33,6 +33,20 @@ class Connector:
         input_flow = kwargs.get("input_flow", 0)
         input_mass = kwargs.get("input_mass", 0)
         return input_mass / input_flow if input_flow != 0 else 0
+    
+    def processEnergy(self, **kwargs):
+        """
+        Calculate output kinetic energy after energy losses.
+        
+        Args:
+            input_energy: Input kinetic energy in Joules
+            
+        Returns:
+            output_energy: Output kinetic energy in Joules
+        """
+        input_energy = kwargs.get("input_energy", 0)
+        return input_energy - self.energyConsumed(**kwargs)
+
 
     def processFlow(self, **kwargs):
         """
@@ -58,7 +72,7 @@ class Connector:
         input_energy = interval * input_mass * (velocity ** 2) / 2
         
         # Calculate output energy after accounting for energy losses
-        output_energy = input_energy - self.energyConsumed(**kwargs)
+        output_energy = self.processEnergy(self, input_energy=input_energy)
 
         # Calculate output flow rate from output energy using inverse kinetic energy formula
         output_flow = math.root(2 * output_energy * self.cross_sectional_area**2 / (self.processDensity(**kwargs) * interval), 3) if self.processDensity(**kwargs) * interval != 0 else 0
