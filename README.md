@@ -1,6 +1,6 @@
 # Ethanol Plant Model
 
-**Version:** 0.4.0
+**Version:** 0.4.1
 
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -21,7 +21,7 @@ Full documentation is available in the [docs](docs/) folder:
 ## Quick Start
 
 ```python
-from systems.processes import Fermentation
+from systems.processors import Fermentation
 
 # Create a fermentation system with 95% efficiency
 fermenter = Fermentation(efficiency=0.95)
@@ -108,7 +108,8 @@ uv pip install .
 ```
 EthanolPlantModel/
 ├── systems/
-│   ├── processes.py    # Core process systems (Fermentation, Filtration, etc.)
+│   ├── process.py      # Base Process class for all systems
+│   ├── processors.py   # Process implementations (Fermentation, Filtration, etc.)
 │   └── connectors.py   # Fluid transport connectors (Pipe, Bend, Valve)
 ├── docs/               # Documentation
 │   ├── README.md
@@ -122,7 +123,15 @@ EthanolPlantModel/
 └── pyproject.toml
 ```
 
-## Recent Updates (v0.4.0)
+## Recent Updates (v0.4.1)
+
+- Restructured codebase: renamed `System` to `Process` and split into separate files
+- `process.py` now contains the base `Process` class
+- `processors.py` contains all process implementations (Fermentation, Filtration, Distillation, Dehydration)
+- Improved code organization and modularity
+- Updated import statements to use relative imports
+
+### Previous Updates (v0.4.0)
 
 - Refactored connector API to use kwargs for improved flexibility
 - Enhanced flow calculation using cube root for accurate energy balance
