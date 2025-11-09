@@ -5,6 +5,28 @@ All notable changes to the Ethanol Plant Model project will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-11-09
+
+### Added
+- **Cost tracking system:**
+  - Added `cost_per_flow` parameter to track cost per unit volumetric flow rate ($/m³/s)
+  - New `cost_per_unit_flow` and `cost_incurred` fields in `consumption_log` for tracking costs
+  - Cost calculations in both `processMassFlow()` and `processVolumetricFlow()` methods
+  - Optional `store_cost` parameter to enable/disable cost logging
+
+### Changed
+- **Refactored consumption tracking:**
+  - Renamed `power_log` → `consumption_log` to encompass power, energy, and cost tracking
+  - Enhanced `consumption_log` dictionary with integrated cost tracking alongside power/energy data
+  - Unified tracking structure for all consumption-related metrics (power, energy, cost)
+
+### Improved
+- **Enhanced project metadata:**
+  - Updated project description with comprehensive feature list
+  - Added keywords for better project discoverability
+  - Added additional project URLs (Repository, Documentation, Changelog, Issues)
+  - Updated license field in pyproject.toml
+
 ## [0.5.3] - 2025-11-09
 
 ### Added

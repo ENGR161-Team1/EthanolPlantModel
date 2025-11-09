@@ -45,6 +45,7 @@ print(f"Ethanol purity: {result['composition']['ethanol']:.2%}")
 - ✅ Mass flow rate and volumetric flow rate balance calculations
 - ✅ Power consumption tracking with configurable rates and units
 - ✅ Energy consumption tracking for all processes with detailed logging
+- ✅ Cost tracking for process economics with configurable rates
 - ✅ Energy loss modeling for fluid transport (Darcy-Weisbach, bend losses)
 - ✅ Configurable efficiency parameters for all process units
 - ✅ Flexible input/output formats (amount, composition, or full)
@@ -132,15 +133,18 @@ EthanolPlantModel/
 └── pyproject.toml
 ```
 
-## Recent Updates (v0.5.3)
+## Recent Updates (v0.6.0)
 
-### Power Consumption Tracking
-- **Implemented comprehensive power consumption tracking system:**
-  - Added structured `power_log` dictionary for tracking power consumption rate (W), energy consumed (J), and time intervals (s)
-  - New `processPowerConsumption()` method for calculating energy consumption based on power rate
-  - Renamed energy-related parameters to power-based terminology for improved accuracy
-  - All processor classes now support power consumption configuration during initialization
-  - Enhanced documentation with detailed parameter descriptions and output explanations
+### Cost Tracking and Consumption Logging
+- **Implemented comprehensive cost tracking system:**
+  - Added `cost_per_flow` parameter for tracking cost per unit volumetric flow rate ($/m³/s)
+  - New `cost_per_unit_flow` and `cost_incurred` fields in consumption logs
+  - Optional `store_cost` parameter in processing methods for flexible cost logging
+  - Cost calculations automatically convert mass flow to volumetric flow for accurate pricing
+- **Refactored consumption tracking:**
+  - Renamed `power_log` to `consumption_log` for unified tracking of power, energy, and cost
+  - Integrated cost tracking alongside existing power/energy metrics
+  - Enhanced project metadata with comprehensive keywords and additional URLs
 
 See [CHANGELOG.md](CHANGELOG.md) for complete version history and previous updates.
 
