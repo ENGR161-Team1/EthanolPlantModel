@@ -33,15 +33,47 @@ cd EthanolPlantModel
 uv pip install .
 ```
 
+## Key Features
+
+- ✅ **Mass and Volumetric Flow Processing** - Handle both mass and volumetric flow rates
+- ✅ **Power Consumption Tracking** - Monitor energy usage with configurable rates
+- ✅ **Cost Tracking** - Track operational costs based on volumetric flow rates
+- ✅ **Flexible I/O Formats** - Support amount, composition, or full output formats
+- ✅ **Comprehensive Logging** - Track inputs, outputs, power, energy, and costs
+- ✅ **Batch Processing** - Process multiple input sets efficiently
+- ✅ **Process Efficiency Modeling** - Configure efficiency parameters for each unit
+- ✅ **Fluid Transport Dynamics** - Model energy losses in pipes, bends, and valves
+
 ## Basic Usage
 
-### Creating a Process
+### Simple Example
 
 ```python
 from systems.processors import Fermentation
 
-# Create a fermentation system with 95% efficiency
-fermenter = Fermentation(efficiency=0.95)
+# Create a fermentation system with efficiency and cost parameters
+fermenter = Fermentation(
+    efficiency=0.95,
+    power_consumption_rate=100,
+    power_consumption_unit="kWh/day",
+    cost_per_flow=25.0  # $25 per m³/s of flow
+)
+
+# Process mass flow inputs with cost tracking
+result = fermenter.processMassFlow(
+    inputs={"ethanol": 0, "water": 100, "sugar": 50, "fiber": 10},
+    input_type="amount",
+    output_type="full",
+    store_outputs=True,
+    store_cost=True  # Track costs
+)
+
+# Access results
+print(f"Ethanol produced: {result['amount']['ethanol']:.2f} kg")
+print(f"Ethanol purity: {result['composition']['ethanol']:.2%}")
+
+# Check consumption data
+print(f"Cost incurred: ${fermenter.consumption_log['cost_incurred'][-1]:.2f}")
 ```
 
 ### Processing Mass Flow Rates

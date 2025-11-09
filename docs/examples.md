@@ -487,4 +487,4 @@ plt.show()
 print("=== Batch Processing Results ===")
 for i, (sugar, ethanol) in enumerate(zip(sugar_inputs, ethanol_outputs)):
     print(f"Batch {i+1}: {sugar} kg/s sugar → {ethanol:.2f} kg/s ethanol")
-```
+````

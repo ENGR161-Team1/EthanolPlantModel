@@ -14,19 +14,21 @@ Process(
     efficiency: float = 1.0,
     massFlowFunction: callable = None,
     power_consumption_rate: float = 0,
-    power_consumption_unit: str = "kWh/day"
+    power_consumption_unit: str = "kWh/day",
+    cost_per_flow: float = 0
 )
 ```
 
 **Parameters:**
-- `name` (str): Name identifier for the process
-- `efficiency` (float): Process efficiency between 0 and 1 (default: 1.0)
-- `massFlowFunction` (callable): Function to transform mass flow inputs to outputs
+- `name` (str): Name of the process
+- `efficiency` (float): Process efficiency (0.0 to 1.0)
+- `massFlowFunction` (callable): Custom function for processing mass flows
 - `power_consumption_rate` (float): Power consumption rate (default: 0)
 - `power_consumption_unit` (str): Unit for power consumption. Options:
   - `"kWh/day"` (default): Kilowatt-hours per day
   - `"kWh/hour"` or `"kW"`: Kilowatts
   - `"W"`: Watts
+- `cost_per_flow` (float): Cost per unit volumetric flow rate in $/m³/s (default: 0)
 
 **Attributes:**
 - `power_log` (dict): Dictionary tracking power consumption with keys:
@@ -35,6 +37,14 @@ Process(
   - `interval`: List of time intervals (s)
 - `input_log` (dict): Logged input data
 - `output_log` (dict): Logged output data
+
+#### consumption_log (dict)
+Unified tracking of power, energy, and cost consumption:
+- `power_consumption_rate` (list): Power consumption at each time step (W)
+- `energy_consumed` (list): Energy consumed in each interval (J)
+- `interval` (list): Time interval for each measurement (s)
+- `cost_per_unit_flow` (list): Cost per unit flow at each time step ($/m³/s)
+- `cost_incurred` (list): Cost incurred for processing each flow ($)
 
 ### Methods
 
@@ -47,28 +57,35 @@ processMassFlow(
     inputs: dict,
     input_type: str = "amount",
     output_type: str = "amount",
-    total_mass_flow: float = None,
+    total_mass: float = None,
     store_inputs: bool = False,
-    store_outputs: bool = False
+    store_outputs: bool = False,
+    store_cost: bool = False
 ) -> dict
 ```
 
 **Parameters:**
-- `inputs` (dict): Input amounts, compositions, or both
-- `input_type` (str): Type of input data
-  - `"amount"`: Absolute amounts (kg/s or kg/hr)
-  - `"composition"`: Fractional compositions (requires `total_mass_flow`)
-  - `"full"`: Both amounts and compositions
-- `output_type` (str): Type of output data
-  - `"amount"`: Returns only amounts
-  - `"composition"`: Returns only compositions
-  - `"full"`: Returns both amounts and compositions
-- `total_mass_flow` (float): Total mass flow rate (required for composition inputs)
-- `store_inputs` (bool): Whether to log inputs (default: False)
-- `store_outputs` (bool): Whether to log outputs (default: False)
+- `inputs` (dict): Input mass flows for each component
+- `input_type` (str): Format of inputs - "amount", "composition", or "full"
+- `output_type` (str): Format of outputs - "amount", "composition", or "full"
+- `total_mass` (float): Total mass flow rate (required for composition inputs)
+- `store_inputs` (bool): Whether to log input values (default: False)
+- `store_outputs` (bool): Whether to log output values (default: False)
+- `store_cost` (bool): Whether to log cost data (default: False)
 
 **Returns:**
-- dict: Processed output in the requested format
+- dict: Processed outputs in the format specified by output_type
+
+**Example:**
+```python
+result = processor.processMassFlow(
+    inputs={"ethanol": 0, "water": 100, "sugar": 50, "fiber": 10},
+    input_type="amount",
+    output_type="full",
+    store_outputs=True,
+    store_cost=True  # Enable cost tracking
+)
+```
 
 #### `processVolumetricFlow()`
 
@@ -79,16 +96,35 @@ processVolumetricFlow(
     inputs: dict,
     input_type: str = "amount",
     output_type: str = "amount",
-    total_volumetric_flow: float = None,
+    total_flow: float = None,
     store_inputs: bool = False,
-    store_outputs: bool = False
+    store_outputs: bool = False,
+    store_cost: bool = False
 ) -> dict
 ```
 
-**Parameters:** Same as `processMassFlow()` but for volumetric flow rates (m³/s or m³/hr)
+**Parameters:**
+- `inputs` (dict): Input volumetric flows for each component
+- `input_type` (str): Format of inputs - "amount", "composition", or "full"
+- `output_type` (str): Format of outputs - "amount", "composition", or "full"
+- `total_flow` (float): Total volumetric flow rate (required for composition inputs)
+- `store_inputs` (bool): Whether to log input values (default: False)
+- `store_outputs` (bool): Whether to log output values (default: False)
+- `store_cost` (bool): Whether to log cost data (default: False)
 
 **Returns:**
-- dict: Processed output in the requested format
+- dict: Processed volumetric flow outputs in the format specified by output_type
+
+**Example:**
+```python
+result = processor.processVolumetricFlow(
+    inputs={"ethanol": 0, "water": 0.1, "sugar": 0.03, "fiber": 0.008},
+    input_type="amount",
+    output_type="full",
+    store_outputs=True,
+    store_cost=True  # Enable cost tracking
+)
+```
 
 #### `processPowerConsumption()`
 

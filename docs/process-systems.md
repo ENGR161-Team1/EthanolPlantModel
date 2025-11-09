@@ -55,6 +55,19 @@ from systems.process import Process
 
 ---
 
+## Common Features
+
+All process systems inherit from the base `Process` class and support:
+
+1. **Mass Flow Processing** - Convert and process mass flow rates
+2. **Volumetric Flow Processing** - Handle volumetric flow rates
+3. **Power Consumption Tracking** - Monitor power usage and energy consumption
+4. **Cost Tracking** - Track operational costs based on flow rates
+5. **Batch Processing** - Process multiple input sets iteratively
+6. **Flexible I/O** - Support amount, composition, or full output formats
+
+---
+
 ## Fermentation
 
 ### Overview
@@ -594,6 +607,53 @@ print(f"Fermentation: {energy1/3_600_000:.2f} kWh")
 print(f"Filtration: {energy2/3_600_000:.2f} kWh")
 print(f"Distillation: {energy3/3_600_000:.2f} kWh")
 ```
+
+---
+
+## Cost Tracking
+
+All processors support cost tracking based on volumetric flow rates:
+
+```python
+from systems.processors import Fermentation
+
+# Create fermenter with power and cost parameters
+fermenter = Fermentation(
+    efficiency=0.95,
+    power_consumption_rate=100,  # kWh/day
+    power_consumption_unit="kWh/day",
+    cost_per_flow=50.0  # $50 per m³/s of flow
+)
+
+# Process with cost tracking enabled
+result = fermenter.processMassFlow(
+    inputs={"ethanol": 0, "water": 100, "sugar": 50, "fiber": 10},
+    input_type="amount",
+    output_type="full",
+    store_outputs=True,
+    store_cost=True  # Enable cost logging
+)
+
+# Access consumption logs
+print(f"Costs incurred: {fermenter.consumption_log['cost_incurred']}")
+print(f"Total cost: ${sum(fermenter.consumption_log['cost_incurred']):.2f}")
+```
+
+### Consumption Log Structure
+
+The `consumption_log` attribute tracks multiple consumption metrics:
+
+```python
+{
+    "power_consumption_rate": [100.0, 100.0, ...],  # Power at each step (W)
+    "energy_consumed": [360000.0, 360000.0, ...],   # Energy per interval (J)
+    "interval": [3600, 3600, ...],                  # Time intervals (s)
+    "cost_per_unit_flow": [50.0, 50.0, ...],        # Cost rate ($/m³/s)
+    "cost_incurred": [5.25, 5.25, ...]              # Actual cost ($)
+}
+```
+
+---
 
 ## Process Efficiency
 
