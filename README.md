@@ -1,6 +1,6 @@
 # Ethanol Plant Model
 
-**Version:** 0.5.3
+**Version:** 0.6.0
 
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
