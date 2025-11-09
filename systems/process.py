@@ -81,14 +81,29 @@ class Process:
                 }
             },
         }
-        self.energy_consumed_log = []
-        self.energy_consumption_rate = kwargs.get("energy_consumption_rate", 0)
-        energy_consumption_unit = kwargs.get("energy_consumption_unit", "kWh/day")
-        if energy_consumption_unit == "kWh/day":
-            self.energy_consumption_rate /= 24  # Convert to kW
-            self.energy_consumption_rate *= 1000  # Convert to W
+        
+        # Power and energy tracking logs
+        self.power_log = {
+            "power_consumption_rate": [],  # Power consumption rate at each time step (W)
+            "energy_consumed": [],  # Energy consumed in each interval (J)
+            "interval": []  # Time interval for each measurement (s)
+        }
+        
+        # Power consumption setup with unit conversion
+        self.power_consumption_rate = kwargs.get("power_consumption_rate", 0)
+        power_consumption_unit = kwargs.get("power_consumption_unit", "kWh/day")
+        
+        # Convert power consumption rate to Watts
+        if power_consumption_unit == "kWh/day":
+            self.power_consumption_rate /= 24  # Convert to kW
+            self.power_consumption_rate *= 1000  # Convert to W
+        if power_consumption_unit == "kWh/hour" or power_consumption_unit == "kW":
+            self.power_consumption_rate *= 1000  # Convert to W
+        
+        # List of all chemical components tracked by this process
         self.components = ["ethanol", "water", "sugar", "fiber"]
         self.efficiency = kwargs.get("efficiency", 1.0)
+        # Custom function to transform mass flow inputs to outputs
         self.massFlowFunction = kwargs.get("massFlowFunction", None)
         
         # Density constants for conversion between mass and flow (kg/m^3)
@@ -249,15 +264,18 @@ class Process:
             # Convert fractional compositions to absolute amounts
             if total_mass_flow is None:
                 raise ValueError("total_mass_flow must be provided when input_type is 'composition'")
+            # Multiply each composition fraction by total flow to get absolute amounts
             input_amounts = {component: inputs[component] * total_mass_flow for component in self.components}
             input_composition = inputs
         elif input_type == "amount":
             # Calculate compositions from amounts
             input_amounts = inputs.copy()
+            # Calculate total if not provided
             if total_mass_flow is None:
                 total_mass_flow = sum(inputs[component] for component in self.components)
             if total_mass_flow <= 0:
                 raise ValueError("Total input amount must be greater than zero to calculate composition")
+            # Calculate fractional composition of each component
             input_composition = {component: input_amounts[component] / total_mass_flow for component in self.components}
         else:  # full
             # Both amounts and compositions provided
@@ -289,6 +307,7 @@ class Process:
             # Calculate compositions for composition or full output
             if output_total <= 0:
                 raise ValueError("Total output amount must be greater than zero to calculate composition")
+            # Calculate fractional composition of each output component
             output_composition = {component: filtered_output[component] / output_total for component in filtered_output}
             if output_type == "composition":
                 # Return only component compositions (no total)
@@ -332,6 +351,7 @@ class Process:
 
         # Convert volumetric flow rate inputs to mass flow rate inputs
         if input_type == "full":
+            # Convert volumetric amounts to mass amounts, keep compositions unchanged
             mass_flow_inputs = {
                 "amount": self.volumetricToMass(inputs=inputs["amount"], mode="amount"),
                 "composition": inputs["composition"]  # Composition is dimensionless
@@ -339,12 +359,14 @@ class Process:
             mass_flow_input_type = "full"
             total_mass_flow = sum(mass_flow_inputs["amount"][component] for component in self.components)
         elif input_type == "amount":
+            # Convert volumetric amounts to mass amounts
             mass_flow_inputs = self.volumetricToMass(inputs=inputs, mode="amount")
             mass_flow_input_type = "amount"
             total_mass_flow = sum(mass_flow_inputs[component] for component in self.components if component in mass_flow_inputs)
         elif input_type == "composition":
             if total_volumetric_flow is None:
                 raise ValueError("total_volumetric_flow must be provided when input_type is 'composition'")
+            # Convert volumetric compositions to mass amounts
             mass_flow_inputs = self.volumetricToMass(inputs=inputs, mode="composition", total_flow=total_volumetric_flow)
             mass_flow_input_type = "amount"
             total_mass_flow = sum(mass_flow_inputs[component] for component in self.components if component in mass_flow_inputs)
@@ -375,6 +397,7 @@ class Process:
         # Store volumetric flow rate inputs if requested (stores to total_volumetric_flow and component amounts/compositions)
         if store_inputs:
             if input_type == "full":
+                # Store both amounts and compositions from full input
                 for component in self.components:
                     if component in inputs["amount"]:
                         self.input_log["volumetric_flow"]["amount"][component].append(inputs["amount"][component])
@@ -382,12 +405,14 @@ class Process:
                         self.input_log["volumetric_flow"]["composition"][component].append(inputs["composition"][component])
                 self.input_log["volumetric_flow"]["total_volumetric_flow"].append(total_volumetric_flow)
             elif input_type == "amount":
+                # Store amounts and calculate compositions from amounts
                 for component in self.components:
                     if component in inputs:
                         self.input_log["volumetric_flow"]["amount"][component].append(inputs[component])
                         self.input_log["volumetric_flow"]["composition"][component].append(inputs[component] / total_volumetric_flow if total_volumetric_flow > 0 else 0)
                 self.input_log["volumetric_flow"]["total_volumetric_flow"].append(total_volumetric_flow)
             elif input_type == "composition":
+                # Store compositions and calculate amounts from compositions
                 for component in self.components:
                     if component in inputs:
                         self.input_log["volumetric_flow"]["composition"][component].append(inputs[component])
@@ -403,6 +428,7 @@ class Process:
                 if component in volumetric_flow_output_amounts:
                     self.output_log["volumetric_flow"]["amount"][component].append(volumetric_flow_output_amounts[component])
                 if component in mass_flow_outputs["composition"]:
+                    # Composition is the same for mass and volumetric flow
                     self.output_log["volumetric_flow"]["composition"][component].append(mass_flow_outputs["composition"][component])
             self.output_log["volumetric_flow"]["total_volumetric_flow"].append(output_total_volumetric_flow)
 
@@ -418,12 +444,13 @@ class Process:
             }
     
 
-    def processEnergyConsumption(self, **kwargs):
+    def processPowerConsumption(self, **kwargs):
         """
-        Calculate energy consumed over a time interval.
+        Calculate energy consumed over a time interval based on power consumption rate.
+        Logs power, energy, and interval.
         
         Args:
-            store_energy: Whether to log the energy consumed
+            store_energy: Whether to log the power and energy data
             interval: Time interval in seconds (default: 1 second)
         
         Returns:
@@ -431,9 +458,20 @@ class Process:
         """
         store_energy = kwargs.get("store_energy", False)
         interval = kwargs.get("interval", 1)  # Default to 1 second if not specified
-        energy_consumed_in_interval = self.energy_consumption_rate * interval  # Energy consumed over the interval in Joules
+        
+        # Energy (J) = Power (W) × Time (s)
+        energy_consumed_in_interval = self.power_consumption_rate * interval
+        
         if store_energy:
-            self.energy_consumed_log.append(energy_consumed_in_interval)
+            # Log power consumption rate (W)
+            self.power_log["power_consumption_rate"].append(self.power_consumption_rate)
+            
+            # Log energy consumed in this interval (J)
+            self.power_log["energy_consumed"].append(energy_consumed_in_interval)
+            
+            # Log the time interval (s)
+            self.power_log["interval"].append(interval)
+        
         return energy_consumed_in_interval
 
     
@@ -479,19 +517,22 @@ class Process:
         for i in range(num_iterations):
             # Build input dictionary for this iteration
             if input_type == "amount":
+                # Extract amounts for each component at index i
                 input_dict = {component: inputValues[component][i] for component in self.components if component in inputValues}
                 total_mass_flow = None
             elif input_type == "composition":
+                # Extract compositions for each component at index i
                 input_dict = {component: inputValues[component][i] for component in self.components if component in inputValues}
                 total_mass_flow = total_mass_flow_list[i]
             else:  # full
+                # Extract both amounts and compositions at index i
                 input_dict = {
                     "amount": {component: inputValues["amount"][component][i] for component in self.components if component in inputValues["amount"]},
                     "composition": {component: inputValues["composition"][component][i] for component in self.components if component in inputValues["composition"]}
                 }
                 total_mass_flow = None
             
-            # Process this input set
+            # Process this input set and store results
             self.processMassFlow(
                 inputs=input_dict,
                 input_type=input_type,
@@ -546,19 +587,22 @@ class Process:
         for i in range(num_iterations):
             # Build input dictionary for this iteration
             if input_type == "amount":
+                # Extract amounts for each component at index i
                 input_dict = {component: inputValues[component][i] for component in self.components if component in inputValues}
                 total_volumetric_flow = None
             elif input_type == "composition":
+                # Extract compositions for each component at index i
                 input_dict = {component: inputValues[component][i] for component in self.components if component in inputValues}
                 total_volumetric_flow = total_volumetric_flow_list[i]
             else:  # full
+                # Extract both amounts and compositions at index i
                 input_dict = {
                     "amount": {component: inputValues["amount"][component][i] for component in self.components if component in inputValues["amount"]},
                     "composition": {component: inputValues["composition"][component][i] for component in self.components if component in inputValues["composition"]}
                 }
                 total_volumetric_flow = None
             
-            # Process this input set
+            # Process this input set and store results
             self.processVolumetricFlow(
                 inputs=input_dict,
                 input_type=input_type,
@@ -588,8 +632,11 @@ class Process:
 
         # Process each set of inputs and appends to outputs
         for i in range(len(inputValues["ethanol"])):
+            # Build dictionary for this iteration's inputs
             input_dict = {key: inputValues[key][i] for key in inputValues}
+            # Apply mass flow function to transform inputs
             output_dict = self.massFlowFunction(input_dict)
+            # Store outputs in log
             for key in self.output_log:
                 self.output_log[key].append(output_dict[key])
 
