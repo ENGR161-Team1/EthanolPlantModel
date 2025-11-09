@@ -517,16 +517,14 @@ class Process:
 
     def processPowerConsumption(self, **kwargs):
         """
-        Calculate energy consumed over a time interval based on power consumption rate.
-        
-        Uses: Energy (J) = Power (W) × Time (s)
+        Get the power consumption rate of the process.
         
         Args:
             store_energy (bool): Whether to log power and energy data. Default: False.
-            interval (float): Time interval in seconds. Default: 1.
+            interval (float): Time interval in seconds for energy calculation. Default: 1.
         
         Returns:
-            float: Energy consumed in Joules (J).
+            float: Power consumption rate in Watts (W).
         """
         store_energy = kwargs.get("store_energy", False)
         interval = kwargs.get("interval", 1)
@@ -538,7 +536,7 @@ class Process:
             self.consumption_log["energy_consumed"].append(energy_consumed_in_interval)
             self.consumption_log["interval"].append(interval)
         
-        return energy_consumed_in_interval
+        return self.power_consumption_rate
 
     def iterateMassFlowInputs(self, inputValues=dict(), **kwargs):
         """
