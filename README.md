@@ -1,6 +1,6 @@
 # Ethanol Plant Model
 
-**Version:** 0.4.0
+**Version:** 0.5.0
 
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -21,17 +21,17 @@ Full documentation is available in the [docs](docs/) folder:
 ## Quick Start
 
 ```python
-from systems.processes import Fermentation
+from systems.processors import Fermentation
 
 # Create a fermentation system with 95% efficiency
 fermenter = Fermentation(efficiency=0.95)
 
-# Process inputs - note the updated API
-result = fermenter.processMass(
+# Process mass flow rate inputs
+result = fermenter.processMassFlow(
     inputs={"ethanol": 0, "water": 100, "sugar": 50, "fiber": 10},
     input_type="amount",
     output_type="full",
-    store_outputs=False
+    store_outputs=True
 )
 
 print(f"Ethanol produced: {result['amount']['ethanol']:.2f} kg")
@@ -41,7 +41,8 @@ print(f"Ethanol purity: {result['composition']['ethanol']:.2%}")
 
 ## Features
 
-- ✅ Mass and volumetric flow balance calculations
+- ✅ Mass flow rate and volumetric flow rate balance calculations
+- ✅ Energy consumption tracking for all processes
 - ✅ Energy loss modeling for fluid transport (Darcy-Weisbach, bend losses)
 - ✅ Configurable efficiency parameters for all process units
 - ✅ Flexible input/output formats (amount, composition, or full)
@@ -59,13 +60,19 @@ print(f"Ethanol purity: {result['composition']['ethanol']:.2%}")
 3. **Distillation** - Separates and concentrates ethanol from impurities
 4. **Dehydration** - Removes remaining water content for high-purity ethanol
 
+All processes support:
+- Mass flow rate processing via `processMassFlow()`
+- Volumetric flow rate processing via `processVolumetricFlow()`
+- Energy consumption tracking via `processEnergyConsumption()`
+- Batch processing via `iterateMassFlowInputs()` and `iterateVolumetricFlowInputs()`
+
 ### Fluid Transport Components
 
 - **Pipe** - Straight segments with friction losses (Darcy-Weisbach equation)
 - **Bend** - Elbows with direction change losses based on bend geometry
 - **Valve** - Flow control with adjustable resistance coefficients
 
-All connectors conserve mass while calculating realistic energy dissipation based on fluid dynamics principles.
+All connectors conserve mass while calculating realistic energy dissipation based on fluid dynamics principles. The connectors use a dedicated `processEnergy` method to calculate output kinetic energy after accounting for energy losses, which is then used to determine output flow rates.
 
 ## Installation
 
@@ -108,7 +115,8 @@ uv pip install .
 ```
 EthanolPlantModel/
 ├── systems/
-│   ├── processes.py    # Core process systems (Fermentation, Filtration, etc.)
+│   ├── process.py      # Base Process class for all systems
+│   ├── processors.py   # Process implementations (Fermentation, Filtration, etc.)
 │   └── connectors.py   # Fluid transport connectors (Pipe, Bend, Valve)
 ├── docs/               # Documentation
 │   ├── README.md
@@ -122,7 +130,57 @@ EthanolPlantModel/
 └── pyproject.toml
 ```
 
-## Recent Updates (v0.4.0)
+## Recent Updates (v0.5.0)
+
+### Major API Improvements
+- **Renamed methods for clarity:**
+  - `processMass()` → `processMassFlow()` - Process mass flow rate inputs
+  - `processFlow()` → `processVolumetricFlow()` - Process volumetric flow rate inputs
+  - `iterateMassInputs()` → `iterateMassFlowInputs()` - Batch process mass flow rates
+  - `iterateFlowInputs()` → `iterateVolumetricFlowInputs()` - Batch process volumetric flow rates
+  - `flowToMass()` → `volumetricToMass()` - Convert volumetric to mass flow rates
+  - `massToFlow()` → `massToVolumetric()` - Convert mass to volumetric flow rates
+
+- **Updated internal attribute names:**
+  - `massFunction` → `massFlowFunction` - Process-specific mass flow rate function
+  - Log structure keys updated: `mass` → `mass_flow`, `flow` → `volumetric_flow`
+  - `total_mass` → `total_mass_flow`, `total_flow` → `total_volumetric_flow`
+
+### New Features
+- **Energy consumption tracking:**
+  - Added `energy_consumed_log` to track energy usage over time
+  - New `processEnergyConsumption()` method for calculating energy consumption
+  - Configurable `energy_consumption_rate` with unit conversion support
+
+### Breaking Changes
+⚠️ **This version introduces breaking changes to the API.** Code using v0.4.x will need updates:
+
+```python
+# Old (v0.4.x)
+result = processor.processMass(inputs=data)
+processor.iterateMassInputs(inputValues=batch_data)
+
+# New (v0.5.0)
+result = processor.processMassFlow(inputs=data)
+processor.iterateMassFlowInputs(inputValues=batch_data)
+```
+
+### Previous Updates (v0.4.2)
+
+- Added `processEnergy` method to Connector class for improved energy calculations
+- Refactored `processFlow` to use the new `processEnergy` method for cleaner code organization
+- Enhanced energy loss calculations with better separation of concerns
+- Fixed cube root calculation using `math.root` for accurate flow rate determination
+
+### Previous Updates (v0.4.1)
+
+- Restructured codebase: renamed `System` to `Process` and split into separate files
+- `process.py` now contains the base `Process` class
+- `processors.py` contains all process implementations (Fermentation, Filtration, Distillation, Dehydration)
+- Improved code organization and modularity
+- Updated import statements to use relative imports
+
+### Previous Updates (v0.4.0)
 
 - Refactored connector API to use kwargs for improved flexibility
 - Enhanced flow calculation using cube root for accurate energy balance
