@@ -1,8 +1,16 @@
 # Examples
 
-**Version:** 0.8.1
+**Version:** 1.0.0
 
 Practical examples and tutorials for using the Ethanol Plant Model.
+
+## 🎉 v1.0.0 - Full Release
+
+The Ethanol Plant Model is now production-ready with:
+- **Stable API** - All interfaces finalized
+- **Complete feature set** - Full simulation capabilities
+- **Professional documentation** - Comprehensive guides and examples
+- **Production validated** - Extensively tested
 
 ## 🆕 v0.8.1 Updates
 
@@ -608,6 +616,8 @@ vol_back = process.massToVolumetric(inputs=mass, mode="amount")
 
 *Cost tracking in Facility class added in v0.8.1*
 
+*Full release v1.0.0 - Production ready!*
+
 *Use `help()` on any class or method to see detailed documentation!*
 
-*Last updated: Version 0.8.1 - November 2025*
+*Last updated: Version 1.0.0 - November 2025*

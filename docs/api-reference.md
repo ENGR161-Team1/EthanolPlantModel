@@ -480,6 +480,14 @@ print(f"Total cost: ${result['total_cost_consumed']:.2f}")
 
 ## Version History
 
+**v1.0.0 - Full Release:**
+- 🎉 Production-ready stable release
+- Complete feature set with validated simulation capabilities
+- Finalized API with backward compatibility guarantee
+- Comprehensive documentation and professional code quality
+- Extensive testing and validation
+- All systems integrated and production-validated
+
 **v0.8.1 Changes:**
 - Added `cost` attribute to Facility class
 - `add_component()` now updates facility cost
