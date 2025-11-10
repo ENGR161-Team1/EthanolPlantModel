@@ -1,6 +1,6 @@
 # Ethanol Plant Model
 
-**Version:** 0.8.0
+**Version:** 0.8.1
 
 [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](docs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -43,6 +43,7 @@ result = facility.facility_process(
 )
 
 print(f"Total power consumed: {result['total_power_consumed']:.2f} W")
+print(f"Total cost consumed: {result['total_cost_consumed']:.2f} USD")
 print(f"Energy generated: {result['power_generated']:.2f} J")
 print(f"Net power gain: {result['net_power_gained']:.2f} J")
 print(f"Ethanol produced: {result['mass_flow']['amount']['ethanol']:.4f} kg/s")
