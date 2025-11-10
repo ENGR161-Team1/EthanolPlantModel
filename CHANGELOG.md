@@ -529,7 +529,7 @@ processor.iterateMassFlowInputs(inputValues=batch_data)
 - Fixed input iteration logic in `iterateInputs()` method
 - Improved massFunction reference handling
 
-## [0.0.5] - 2025-11-XX
+## [0.0.5] - 2025-11-04
 
 ### Added
 - **Batch input processing:**
@@ -549,7 +549,7 @@ processor.iterateMassFlowInputs(inputValues=batch_data)
 - Corrected massFunction references throughout the codebase
 - Removed debugging print statements for production readiness
 
-## [0.0.4] - 2025-11-XX
+## [0.0.4] - 2025-11-03
 
 ### Added
 - **Dehydration process:**
@@ -565,7 +565,7 @@ processor.iterateMassFlowInputs(inputValues=batch_data)
   - Included usage examples for all four process stages
   - Improved project metadata in pyproject.toml
 
-## [0.0.3] - 2025-11-XX
+## [0.0.3] - 2025-11-03
 
 ### Added
 - **Distillation process:**
@@ -585,7 +585,7 @@ processor.iterateMassFlowInputs(inputValues=batch_data)
 - Fixed project version naming inconsistencies
 - Corrected author name formatting in configuration files
 
-## [0.0.2] - 2025-11-XX
+## [0.0.2] - 2025-11-03
 
 ### Added
 - **Filtration process:**
@@ -600,7 +600,7 @@ processor.iterateMassFlowInputs(inputValues=batch_data)
   - Better parameter handling
   - Improved internal structure
 
-## [0.0.1] - 2025-11-XX
+## [0.0.1] - 2025-11-03
 
 ### Added
 - **Core System class:**
