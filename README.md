@@ -157,14 +157,18 @@ EthanolPlantModel/
 └── pyproject.toml
 ```
 
-## Recent Updates (v0.8.0)
+## Recent Updates (v0.8.1)
 
-### New System Components
-- **Pump class:** Models pumping operations with efficiency-based energy calculations, configurable performance ratings, and accurate flow velocity modeling
-- **Facility class:** Provides integrated system management for complete process chains with automatic power tracking and net energy gain analysis
+### Cost Tracking System
+- **Facility cost tracking:** New `cost` attribute tracks total facility cost across all components and pump
+- **Cost consumption tracking:** `facility_process()` now returns `total_cost_consumed` field for economic analysis
+- **Component-level cost accumulation:** Automatic cost tracking for pump operations, process flows, and connectors
 
-### Enhanced Power Modeling
-- **Updated `processPowerConsumption()`:** Now returns power consumption rate (W) instead of energy consumed (J), providing clearer instantaneous power information while maintaining energy logging capabilities
+### Enhanced Batch Processing
+- **Added `store_cost` parameter:** Process batch methods (`iterateMassFlowInputs()` and `iterateVolumetricFlowInputs()`) now support cost logging
+
+### Code Improvements
+- **Simplified processor initialization:** Cleaner constructor implementations for Fermentation, Filtration, Distillation, and Dehydration classes
 
 See [CHANGELOG.md](CHANGELOG.md) for complete version history and previous updates.
 
