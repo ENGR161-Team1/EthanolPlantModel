@@ -1,0 +1,11 @@
+pump,fermenter,filtration,distillation,dehydration,diameter,friction_factor,threshold_flow,composite_score
+Cheap,Scrap,Scrap,Scrap,Scrap,0.1,0.002,0.04,65.53428728792345
+Cheap,Scrap,Scrap,Scrap,Scrap,0.1,0.01,0.04,65.53428728792345
+Cheap,Scrap,Scrap,Scrap,Scrap,0.1,0.02,0.04,65.53428728792345
+Cheap,Scrap,Scrap,Scrap,Scrap,0.1,0.03,0.04,65.53428728792345
+Cheap,Scrap,Scrap,Scrap,Scrap,0.1,0.04,0.04,65.53428728792345
+Cheap,Scrap,Scrap,Scrap,Scrap,0.1,0.05,0.04,65.53428728792345
+Cheap,Scrap,Scrap,Scrap,Scrap,0.11,0.002,0.04,65.5343085853234
+Cheap,Scrap,Scrap,Scrap,Scrap,0.11,0.01,0.04,65.5343085853234
+Cheap,Scrap,Scrap,Scrap,Scrap,0.11,0.02,0.04,65.5343085853234
+Cheap,Scrap,Scrap,Scrap,Scrap,0.11,0.03,0.04,65.5343085853234
